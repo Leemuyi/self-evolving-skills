@@ -16,6 +16,24 @@ def test_redacts_token_like_assignment():
     assert "[REDACTED]" in redacted
 
 
+def test_redacts_bearer_token_without_preserving_value():
+    text = "Authorization: Bearer abcdefghijklmnopqrstuvwxyz"
+
+    redacted = redact(text)
+
+    assert "abcdefghijklmnopqrstuvwxyz" not in redacted
+    assert "Bearer [REDACTED]" in redacted
+
+
+def test_redacts_github_token_without_preserving_value():
+    text = "github token ghp_abcdefghijklmnopqrstuvwxyz1234567890"
+
+    redacted = redact(text)
+
+    assert "ghp_abcdefghijklmnopqrstuvwxyz1234567890" not in redacted
+    assert "[REDACTED]" in redacted
+
+
 def test_user_correction_becomes_memory_candidate():
     candidates = extract("以后不要直接发布，先给我确认", role="user")
 

@@ -25,6 +25,24 @@ def test_resolve_allowed_rejects_parent_traversal():
         raise AssertionError("parent traversal was accepted")
 
 
+def test_resolve_allowed_rejects_prefix_sibling_escape(monkeypatch, tmp_path):
+    root = tmp_path / "self-evolving-skills"
+    root.mkdir()
+    sibling = tmp_path / "self-evolving-skills-evil"
+    sibling.mkdir()
+    monkeypatch.setattr(apply_decisions, "ROOT", root)
+
+    target_link = root / "references"
+    target_link.symlink_to(sibling, target_is_directory=True)
+
+    try:
+        apply_decisions.resolve_allowed("references/escape.md")
+    except ValueError as exc:
+        assert "escapes root" in str(exc)
+    else:
+        raise AssertionError("prefix sibling escape was accepted")
+
+
 def test_append_markdown_dry_run_does_not_write(tmp_path):
     target = tmp_path / "note.md"
 

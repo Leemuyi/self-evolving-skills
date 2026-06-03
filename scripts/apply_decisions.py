@@ -47,9 +47,12 @@ def resolve_allowed(path_text: str) -> Path:
         raise ValueError(f"path must be relative and stay under dev skill: {path_text}")
     if rel.parts[0] not in ALLOWED_TOP_LEVEL:
         raise ValueError(f"path top-level not allowed: {path_text}")
-    target = (ROOT / rel).resolve()
-    if not str(target).startswith(str(ROOT.resolve())):
-        raise ValueError(f"resolved path escapes root: {path_text}")
+    root = ROOT.resolve()
+    target = (root / rel).resolve()
+    try:
+        target.relative_to(root)
+    except ValueError:
+        raise ValueError(f"resolved path escapes root: {path_text}") from None
     if target.suffix.lower() not in {".md", ".yaml", ".yml", ""}:
         raise ValueError(f"only markdown/yaml-like files can be appended: {path_text}")
     return target

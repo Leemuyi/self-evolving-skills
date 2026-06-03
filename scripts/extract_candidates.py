@@ -51,8 +51,15 @@ TARGET_HINTS = [
 
 
 def redact(text: str) -> str:
-    for pattern in SECRET_PATTERNS:
-        text = pattern.sub(lambda m: re.split(r"[:=]", m.group(0), maxsplit=1)[0] + "=[REDACTED]", text)
+    """Redact secret-like values without preserving credential material."""
+    text = re.sub(r"Bearer\s+[A-Za-z0-9._~+/=-]{12,}", "Bearer [REDACTED]", text, flags=re.I)
+    text = re.sub(r"(?i)(ghp|github_pat|sk-[A-Za-z0-9])[A-Za-z0-9_\-]{16,}", "[REDACTED]", text)
+    text = re.sub(
+        r"(?i)(api[_-]?key|token|password|secret)\s*[:=]\s*\S+",
+        lambda m: re.split(r"[:=]", m.group(0), maxsplit=1)[0] + "=[REDACTED]",
+        text,
+    )
+    text = re.sub(r"(?i)authorization\s*[:=]\s*(?!Bearer \[REDACTED\])\S+", "Authorization=[REDACTED]", text)
     return text
 
 
