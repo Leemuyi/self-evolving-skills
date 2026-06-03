@@ -1,0 +1,18 @@
+# Python/cache artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated local reports from session scans/reviews
+reports/*.json
+reports/*.yaml
+reports/*.yml
+reports/*.md
+!reports/.gitkeep
+
+# Local environment/secrets
+.env
+*.env
+*.key
+*.pem
+*.crt
